@@ -17,7 +17,7 @@ class ArticleController extends Controller
     public function index()
     {
         // Get list of articles with pagination config
-        $articles = Article::paginate(5);
+        $articles = Article::orderBy('created_at', 'desc')->paginate(5);
 
         // Return a collection with resource
         return ArticleResource::collection($articles);
@@ -33,11 +33,11 @@ class ArticleController extends Controller
     {
         // Check if request is a put / post
         $article = $request->isMethod('put')
-            ? Article::findOrFail($request->article_id)
+            ? Article::findOrFail($request->id)
             : new Article;
 
         // Populate article with requests
-        $article->id = $request->input('article_id');
+        $article->id = $request->input('id');
         $article->title = $request->input('title');
         $article->body = $request->input('body');
 
