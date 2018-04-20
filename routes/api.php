@@ -17,6 +17,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Authentication Api
+Route::post('register', 'UserController@register');
+
 
 // RESTful Api for article model
 Route::get('articles', 'ArticleController@index');

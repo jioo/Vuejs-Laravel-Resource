@@ -22,7 +22,7 @@
         <div id="app">
             <navbar></navbar>
             <div class="container">
-                <articles></articles>
+                <router-view></router-view>
             </div>
         </div>
         <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
