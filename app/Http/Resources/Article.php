@@ -19,7 +19,8 @@ class Article extends Resource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'body' => $this->body
+            'body' => $this->body,
+            'image' => $this->image
         ];
     }
 }

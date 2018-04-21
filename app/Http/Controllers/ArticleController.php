@@ -31,6 +31,7 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+        $upload_file = FALSE;
         // Check if request is a put / post
         $article = $request->isMethod('put')
             ? Article::findOrFail($request->id)
@@ -41,8 +42,34 @@ class ArticleController extends Controller
         $article->title = $request->input('title');
         $article->body = $request->input('body');
 
-        // Return the article reource if query has been successful
+        // Handle file request
+        // Check if input file has value
+        if($request->hasFile('file')) {
+            $image = $request->file('file');
+            $image_file_name = time().'.'.$image->getClientOriginalExtension();
+
+            // Delete the previous image on update
+            if($request->isMethod('put')) {
+                $this->unlinkImage($article->image);
+            }
+
+            // Save the new image file name
+            $article->image = $image_file_name;
+            $upload_file = TRUE;
+
+        } else if ($request->isMethod('post')) {
+            // Set default image if file is empty
+            $article->image = 'default.jpg';
+        }
+
+        // Return the response if query has been successful
         if($article->save()) {
+            // Save image to public/files
+            if($upload_file) {
+                $destinationPath = public_path('/files');
+                $image->move($destinationPath, $image_file_name);
+            }
+
             return new ArticleResource($article);
         }
     }
@@ -58,7 +85,7 @@ class ArticleController extends Controller
         // Get singe articles
         $article = Article::findOrFail($id);
 
-        // Return article resource
+        // Return response
         return new ArticleResource($article);
     }
 
@@ -72,10 +99,28 @@ class ArticleController extends Controller
     {
         // Get singe articles
         $article = Article::findOrFail($id);
+        $this->unlinkImage($article->image);
 
-        // Return article resource if delete query has been successful
+        // Return response if delete query has been successful
         if($article->delete()) {
             return new ArticleResource($article);
+        }
+    }
+
+    /* ========================================================================= *\
+     * Helpers
+    \* ========================================================================= */
+
+    /**
+     * Delete a specific file in public files path
+     * except for default image
+     *
+     * @param  string  $file_name
+     */
+    private function unlinkImage($file_name) {
+        $path = public_path('/files').'/';
+        if($file_name != 'default.jpg') {
+            unlink($path . $file_name);
         }
     }
 }

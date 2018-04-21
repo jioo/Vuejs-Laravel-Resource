@@ -1,10 +1,16 @@
 <template lang="html">
-    <div class="">
+    <div class="" >
         <h2>List of Articles</h2>
-        <form @submit.prevent="storeArticle" class="mb-2">
+        <form id="form" @submit.prevent="storeArticle" class="mb-2">
             <div class="form-group">
-                <input type="text" class="form-control mb-2" placeholder="Title" v-model="article.title">
-                <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea>
+                <input type="text" class="form-control mb-2" placeholder="Title" v-model="article.title" required>
+                <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea required>
+                <input type="file" id="file" ref="file" @change="previewImage"/>
+                <div class="row">
+                    <div class="col-md-6 image-preview" v-if="preview_image.length > 0">
+                        <img class="img-fluid" :src="preview_image" style="max-height:200px;">
+                    </div>
+                </div>
             </div>
             <button type="submit" class="btn btn-light btn-block">Save</button>
         </form>
@@ -24,6 +30,7 @@
         <div class="card card-body mb-2" v-for="article in articles" v-bind:key="articles.id">
             <h3>{{ article.title }}</h3>
             <p>{{ article.body }}</p>
+            <img class="img-fluid" v-bind:src="image_path + article.image" style="max-height: 400px;">
             <hr>
             <button type="button" name="button" class="btn btn-warning mb-2" @click="editArticle(article)">Edit</button>
             <button type="button" name="button" class="btn btn-danger" @click="deleteArticle(article.id)">Delete</button>
@@ -37,6 +44,9 @@ import ArticlesService from '../services/ArticlesService'
 export default {
     data () {
         return {
+            preview_image: '',
+            file: '',
+            image_path: 'http://localhost/vue-laravel/public/files/',
             articles: [],
             article: {
                 id: '',
@@ -53,6 +63,7 @@ export default {
             let response = (await ArticlesService.get(url)).data;
             this.articles = (response).data;
             this.makePagination(await response.links, await response.meta);
+            this.resetForm();
         },
         makePagination(links, meta) {
             let pagination = {
@@ -64,30 +75,61 @@ export default {
             this.pagination = pagination;
         },
         storeArticle() {
-            if(this.edit) {
-                // Update Article
-                ArticlesService.put(this.article)
-                    .then((response) => {
-                        alert('An article has been updated');
+            let formData = new FormData();
+            formData.append('title', this.article.title);
+            formData.append('body', this.article.body);
+            formData.append('file', this.file);
 
-                        this.getArticles();
-                        this.resetForm();
-                    });
-            } else {
+            if(!this.edit) {
                 // Insert article
-                ArticlesService.post(this.article)
+                ArticlesService.post(formData)
                     .then((response) => {
                         alert('New article has been added');
 
                         this.getArticles();
-                        this.resetForm();
+                    });
+            } else {
+                // Update Article
+                formData.append('id', this.article.id);
+
+                // Laravel BUG: Input from PUT requests sent as multipart/form-data:
+                // solution: You should send POST and set _method to
+                // PUT (same as sending forms) to make your files visible
+                // https://github.com/laravel/framework/issues/13457
+                formData.append('_method', 'PUT');
+
+                ArticlesService.post(formData)
+                    .then((response) => {
+                        alert('An article has been updated');
+
+                        this.getArticles();
                     });
             }
         },
+        previewImage(event) {
+            var input = event.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = (e) => {
+                    this.preview_image = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                this.preview_image = '';
+            }
+
+            this.file = this.$refs.file.files[0];
+        },
+        removeImage: function (item) {
+            item.image = false;
+        },
         editArticle(article) {
+            $('html, body').animate({scrollTop : 0},500);
+
             this.article.id = article.id;
             this.article.title = article.title;
             this.article.body = article.body;
+            this.preview_image = this.image_path + article.image;
             this.edit = true;
         },
         deleteArticle(id) {
@@ -103,6 +145,9 @@ export default {
             this.article.id = '';
             this.article.title = '';
             this.article.body = '';
+            this.file = '';
+            this.preview_image = '';
+            this.$refs.file.value = null;
             this.edit = false;
         }
     },
