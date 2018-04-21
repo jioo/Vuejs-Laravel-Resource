@@ -1,5 +1,6 @@
 <template lang="html">
     <div class="" >
+        <notifications position="bottom right" classes="vue-notification"/>
         <h2>List of Articles</h2>
         <form id="form" @submit.prevent="storeArticle" class="mb-2">
             <div class="form-group">
@@ -35,12 +36,12 @@
             <button type="button" name="button" class="btn btn-warning mb-2" @click="editArticle(article)">Edit</button>
             <button type="button" name="button" class="btn btn-danger" @click="deleteArticle(article.id)">Delete</button>
         </div>
+
     </div>
 </template>
 
 <script>
 import ArticlesService from '../services/ArticlesService'
-
 export default {
     data () {
         return {
@@ -84,8 +85,7 @@ export default {
                 // Insert article
                 ArticlesService.post(formData)
                     .then((response) => {
-                        alert('New article has been added');
-
+                        this.$notify({type: 'success', title: 'New article has been added'});
                         this.getArticles();
                     });
             } else {
@@ -100,8 +100,7 @@ export default {
 
                 ArticlesService.post(formData)
                     .then((response) => {
-                        alert('An article has been updated');
-
+                        this.$notify({type: 'success', title: 'An article has been updated'});
                         this.getArticles();
                     });
             }
@@ -136,7 +135,7 @@ export default {
             if(confirm('Are you sure you want to delete this?')) {
                 ArticlesService.delete(id)
                     .then((response) => {
-                        alert('Article has been removed');
+                        this.$notify({type: 'error', title: 'An article has been removed'});
                         this.getArticles();
                     });
             }
@@ -158,5 +157,30 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style>
+.vue-notification {
+  padding: 15px;
+  margin: 0 5px 5px;
+
+  font-size: 16px;
+
+  color: #ffffff;
+  background: #44A4FC;
+  border-left: 5px solid #187FE7;
+
+  &.warn {
+    background: #ffb648;
+    border-left-color: #f48a06;
+  }
+
+  &.error {
+    background: #E54D42;
+    border-left-color: #B82E24;
+  }
+
+  &.success {
+    background: #68CD86;
+    border-left-color: #42A85F;
+  }
+}
 </style>

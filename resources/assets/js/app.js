@@ -10,8 +10,10 @@ require('./bootstrap');
 window.Vue = require('vue');
 import VueRouter from 'vue-router'
 import router from './router'
+import Notifications from 'vue-notification'
 
 Vue.use(VueRouter);
+Vue.use(Notifications);
 
 // Global Vue Components
 Vue.component('navbar', require('./components/Navbar'));
