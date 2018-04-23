@@ -42,6 +42,9 @@
 
 <script>
 import ArticlesService from '../services/ArticlesService'
+import Nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
+
 export default {
     data () {
         return {
@@ -76,6 +79,7 @@ export default {
             this.pagination = pagination;
         },
         storeArticle() {
+            Nprogress.start();
             let formData = new FormData();
             formData.append('title', this.article.title);
             formData.append('body', this.article.body);
@@ -85,8 +89,10 @@ export default {
                 // Insert article
                 ArticlesService.post(formData)
                     .then((response) => {
-                        this.$notify({type: 'success', title: 'New article has been added'});
+                        const article = (response.data).data
+                        this.$notify({type: 'success', title: "Article: " + article.title + " has been added"});
                         this.getArticles();
+                        Nprogress.done();
                     });
             } else {
                 // Update Article
@@ -100,8 +106,10 @@ export default {
 
                 ArticlesService.post(formData)
                     .then((response) => {
-                        this.$notify({type: 'success', title: 'An article has been updated'});
+                        const article = (response.data).data
+                        this.$notify({type: 'success', title: "Article: " + article.title + " has been updated"});
                         this.getArticles();
+                        Nprogress.done();
                     });
             }
         },
@@ -132,11 +140,14 @@ export default {
             this.edit = true;
         },
         deleteArticle(id) {
+            Nprogress.start();
             if(confirm('Are you sure you want to delete this?')) {
                 ArticlesService.delete(id)
                     .then((response) => {
-                        this.$notify({type: 'error', title: 'An article has been removed'});
+                        const article = (response.data).data
+                        this.$notify({type: 'error', title: "Article: " + article.title + " has been removed"});
                         this.getArticles();
+                        Nprogress.done();
                     });
             }
         },
@@ -151,13 +162,19 @@ export default {
         }
     },
 
+    created() {
+        Nprogress.start()
+    },
+
     mounted () {
         this.getArticles();
+        Nprogress.done()
     }
 }
 </script>
 
 <style>
+
 .vue-notification {
   padding: 15px;
   margin: 0 5px 5px;

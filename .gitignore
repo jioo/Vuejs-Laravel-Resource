@@ -13,3 +13,4 @@ yarn-error.log
 
 /public/files/*
 !/public/files/default.jpg
+env.js

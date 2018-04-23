@@ -3,18 +3,18 @@ import Api from './Api'
 export default {
     get (url) {
         url = url || 'articles';
-        return Api().get(url)
+        return Api().get('api/' + url)
     },
     show (id) {
-        return Api().get(`article/${id}`)
+        return Api().get(`api/article/${id}`)
     },
     post (article) {
-        return Api().post('article', article, { headers: {'Content-Type': 'multipart/form-data'} })
+        return Api().post('api/article', article, { headers: {'Content-Type': 'multipart/form-data'} })
     },
     put (article) {
-        return Api().put('article', article, { headers: {'Content-Type': 'multipart/form-data'} })
+        return Api().put('api/article', article, { headers: {'Content-Type': 'multipart/form-data'} })
     },
     delete (id) {
-        return Api().delete(`article/${id}`)
+        return Api().delete(`api/article/${id}`)
     }
 }

@@ -11,6 +11,7 @@ window.Vue = require('vue');
 import VueRouter from 'vue-router'
 import router from './router'
 import Notifications from 'vue-notification'
+import 'nprogress/nprogress.css'
 
 Vue.use(VueRouter);
 Vue.use(Notifications);
