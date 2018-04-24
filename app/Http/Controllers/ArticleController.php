@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Article;
+use App\Events\ArticleEvent;
 use App\Http\Resources\Article as ArticleResource;
 
 class ArticleController extends Controller
@@ -101,10 +102,22 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $this->unlinkImage($article->image);
 
-        // Return response if delete query has been successful
+        // If delete query has been successful
         if($article->delete()) {
+
+            // Create broadcast event
+            event(new \App\Events\ArticleEvent($article));
+
+            // Return response
             return new ArticleResource($article);
         }
+    }
+
+    public function test()
+    {
+        $message = 'test from event function';
+        event(new ArticleEvent($message));
+        echo 'test';
     }
 
     /* ========================================================================= *\
