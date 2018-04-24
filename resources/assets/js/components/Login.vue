@@ -5,14 +5,14 @@
                 <div class="card-header">Login</div>
                 <div class="card-body">
                     <div class="card-text">
-                        <form class="form-horizontal" @submit.prevent="login">
+                        <form class="form-horizontal" @submit.prevent="onSubmit">
                             <div class="form-group">
                                 <label for="email" class="control-label">E-Mail Address</label>
-                                <input type="email" class="form-control" v-model="email" required autofocus>
+                                <input type="email" class="form-control" v-model="form.username" required autofocus>
                             </div>
                             <div class="form-group">
                                 <label for="password" class="control-label">Password</label>
-                                <input type="password" class="form-control" v-model="password" required>
+                                <input type="password" class="form-control" v-model="form.password" required>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">
@@ -29,32 +29,32 @@
 
 <script>
 import AuthService from '../services/AuthService'
-// import {client_id, client_secret} from './env'
+import { mapActions } from 'vuex'
 
 export default {
     data () {
         return {
-            email: '',
-            password: ''
+            form: {
+                username: '',
+                password: ''
+            }
         }
     },
 
     methods: {
-        login() {
-            let credentials = {
-                username: this.email,
-                password: this.password,
-                client_id: '2',
-                client_secret: 'X1FvyCRde5NZNGIy0bFritUR11C9udeDcMWOZcCc',
-                grant_type: "password"
-            }
+        ...mapActions([
+          'login'
+        ]),
 
-            AuthService.login(credentials).then((response) => {
-                let token = response.data.access_token
-                localStorage.setItem('access_token', token)
+        onSubmit() {
+            this.login(this.form).then(() => {
+                this.$router.push('/')
             })
+            // AuthService.login(credentials).then((response) => {
+            //     let token = response.data.access_token
+            //     localStorage.setItem('access_token', token)
+            // })
         }
-
     }
 }
 </script>

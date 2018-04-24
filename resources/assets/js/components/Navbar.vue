@@ -8,12 +8,16 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
+                        <li class="nav-item" v-if="!user">
                             <router-link to="/login" active-class="active" class="nav-link">Login</router-link>
                         </li>
 
-                        <li class="nav-item">
+                        <li class="nav-item" v-if="!user">
                             <router-link to="/register" active-class="active" class="nav-link">Register</router-link>
+                        </li>
+
+                        <li class="nav-item" v-if="user">
+                            <a href="#" class="nav-link active" @click="logout">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -23,7 +27,18 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+
 export default {
+    computed: {
+        ...mapState(['user'])
+    },
+
+    methods: {
+        ...mapActions([
+            'logout'
+        ])
+    }
 }
 </script>
 

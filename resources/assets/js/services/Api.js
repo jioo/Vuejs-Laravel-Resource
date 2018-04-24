@@ -8,18 +8,17 @@ export default () => {
 
     // Authorization header
     instance.interceptors.request.use(function (config) {
-      // config['headers'] = {
-      //   Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-      //   Accept: 'application/json',
-      // }
+      config['headers'] = {
+        Authorization: 'Bearer ' + localStorage.getItem('access_token')
+      }
       // NProgress.start();
-      console.log('starting..')
+      // console.log('starting..')
       return config
     }, error => Promise.reject(error))
 
     // Show toast with message for non OK responses
     instance.interceptors.response.use(response => {
-        console.log('done..')
+        // console.log('done..')
         return response
     }, error => {
       // store.dispatch('addToastMessage', {
