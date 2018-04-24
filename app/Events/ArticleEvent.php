@@ -34,6 +34,6 @@ class ArticleEvent implements ShouldBroadcast
     public function broadcastOn()
     {
         // return new PrivateChannel('channel-name');
-        return ["article-channel"];
+        return new Channel('article-channel');
     }
 }

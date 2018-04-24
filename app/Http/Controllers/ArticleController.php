@@ -98,27 +98,31 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
+
+
         // Get singe articles
         $article = Article::findOrFail($id);
+
+
+
         $this->unlinkImage($article->image);
 
         // If delete query has been successful
         if($article->delete()) {
-
             // Create broadcast event
-            event(new \App\Events\ArticleEvent($article));
+            event(new ArticleEvent($article->title . ' has been deleted!'));
 
             // Return response
             return new ArticleResource($article);
         }
     }
 
-    public function test()
-    {
-        $message = 'test from event function';
-        event(new ArticleEvent($message));
-        echo 'test';
-    }
+    // public function test()
+    // {
+    //     $message = 'test from event function';
+    //     event(new ArticleEvent($messageSD));
+    //     echo 'fired';
+    // }
 
     /* ========================================================================= *\
      * Helpers
