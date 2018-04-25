@@ -15935,7 +15935,7 @@ if (inBrowser && window.Vue) {
 /* harmony default export */ __webpack_exports__["a"] = ({
     login: function login(user) {
         user.client_id = '2';
-        user.client_secret = 'plI9LQnfqb6dlFmmfraKgt3iHrBzlJtjyDMshwQo';
+        user.client_secret = 'X1FvyCRde5NZNGIy0bFritUR11C9udeDcMWOZcCc';
         user.grant_type = "password";
         return Object(__WEBPACK_IMPORTED_MODULE_0__Api__["a" /* default */])().post('oauth/token', user);
     }
@@ -15955,16 +15955,22 @@ if (inBrowser && window.Vue) {
 
 /* harmony default export */ __webpack_exports__["a"] = (function () {
     var instance = __WEBPACK_IMPORTED_MODULE_0_axios___default.a.create({
-        baseURL: 'http://localhost/vue-laravel/public/'
+        baseURL: 'http://localhost/vue-laravel/public/',
+        headers: { 'Access-Control-Allow-Origin': '*' }
     });
 
     // Authorization header
     instance.interceptors.request.use(function (config) {
         config['headers'] = {
-            Authorization: 'Bearer ' + localStorage.getItem('access_token')
-            // NProgress.start();
-            // console.log('starting..')
-        };return config;
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            // 'Access-Control-Allow-Origin': '*'
+            // 'Access-Control-Request-Method': 'GET, PUT, POST, PATCH, DELETE, OPTIONS',
+            // 'Access-Control-AllowHeaders': '*',
+            // 'X-Requested-With': 'XMLHttpRequest'
+        };
+        // NProgress.start();
+        // console.log('starting..')
+        return config;
     }, function (error) {
         return Promise.reject(error);
     });
@@ -15972,6 +15978,8 @@ if (inBrowser && window.Vue) {
     // Show toast with message for non OK responses
     instance.interceptors.response.use(function (response) {
         // console.log('done..')
+
+        // console.log(response.request.headers);
         return response;
     }, function (error) {
         // store.dispatch('addToastMessage', {
@@ -53163,8 +53171,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
             this.pagination = pagination;
         },
         storeArticle: function storeArticle() {
-            var _this = this;
-
             __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.start();
             var formData = new FormData();
             formData.append('title', this.article.title);
@@ -53175,8 +53181,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
                 // Insert article
                 __WEBPACK_IMPORTED_MODULE_1__services_ArticlesService__["a" /* default */].post(formData).then(function (response) {
                     var article = response.data.data;
-                    _this.$notify({ type: 'success', title: "Article: " + article.title + " has been added" });
-                    _this.getArticles();
+                    // this.$notify({type: 'success', title: "Article: " + article.title + " has been added"});
+                    // this.getArticles();
                     __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.done();
                 });
             } else {
@@ -53191,20 +53197,20 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
                 __WEBPACK_IMPORTED_MODULE_1__services_ArticlesService__["a" /* default */].post(formData).then(function (response) {
                     var article = response.data.data;
-                    _this.$notify({ type: 'success', title: "Article: " + article.title + " has been updated" });
-                    _this.getArticles();
+                    // this.$notify({type: 'success', title: "Article: " + article.title + " has been updated"});
+                    // this.getArticles();
                     __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.done();
                 });
             }
         },
         previewImage: function previewImage(event) {
-            var _this2 = this;
+            var _this = this;
 
             var input = event.target;
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    _this2.preview_image = e.target.result;
+                    _this.preview_image = e.target.result;
                 };
                 reader.readAsDataURL(input.files[0]);
             } else {
@@ -53227,14 +53233,12 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
             this.edit = true;
         },
         deleteArticle: function deleteArticle(id) {
-            var _this3 = this;
-
             __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.start();
             if (confirm('Are you sure you want to delete this?')) {
                 __WEBPACK_IMPORTED_MODULE_1__services_ArticlesService__["a" /* default */].delete(id).then(function (response) {
                     var article = response.data.data;
-                    _this3.$notify({ type: 'error', title: "Article: " + article.title + " has been removed" });
-                    _this3.getArticles();
+                    // this.$notify({type: 'error', title: "Article: " + article.title + " has been removed"});
+                    // this.getArticles();
                     __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.done();
                 });
             }
@@ -53254,8 +53258,15 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
         __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.start();
     },
     mounted: function mounted() {
+        var _this2 = this;
+
         this.getArticles();
         __WEBPACK_IMPORTED_MODULE_2_nprogress___default.a.done();
+
+        Echo.channel('article-channel').listen('ArticleEvent', function (article) {
+            _this2.getArticles();
+            _this2.$notify({ type: article.type, title: "Article: " + article.title + " has been removed" });
+        });
     }
 });
 
@@ -54076,7 +54087,7 @@ exports = module.exports = __webpack_require__(1)(false);
 
 
 // module
-exports.push([module.i, "/* Make clicks pass-through */\n#nprogress {\n  pointer-events: none;\n}\n\n#nprogress .bar {\n  background: #29d;\n\n  position: fixed;\n  z-index: 1031;\n  top: 0;\n  left: 0;\n\n  width: 100%;\n  height: 2px;\n}\n\n/* Fancy blur effect */\n#nprogress .peg {\n  display: block;\n  position: absolute;\n  right: 0px;\n  width: 100px;\n  height: 100%;\n  box-shadow: 0 0 10px #29d, 0 0 5px #29d;\n  opacity: 1.0;\n\n  -webkit-transform: rotate(3deg) translate(0px, -4px);\n      -ms-transform: rotate(3deg) translate(0px, -4px);\n          transform: rotate(3deg) translate(0px, -4px);\n}\n\n/* Remove these to get rid of the spinner */\n#nprogress .spinner {\n  display: block;\n  position: fixed;\n  z-index: 1031;\n  top: 15px;\n  right: 15px;\n}\n\n#nprogress .spinner-icon {\n  width: 18px;\n  height: 18px;\n  box-sizing: border-box;\n\n  border: solid 2px transparent;\n  border-top-color: #29d;\n  border-left-color: #29d;\n  border-radius: 50%;\n\n  -webkit-animation: nprogress-spinner 400ms linear infinite;\n          animation: nprogress-spinner 400ms linear infinite;\n}\n\n.nprogress-custom-parent {\n  overflow: hidden;\n  position: relative;\n}\n\n.nprogress-custom-parent #nprogress .spinner,\n.nprogress-custom-parent #nprogress .bar {\n  position: absolute;\n}\n\n@-webkit-keyframes nprogress-spinner {\n  0%   { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n@keyframes nprogress-spinner {\n  0%   { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n", ""]);
+exports.push([module.i, "/* Make clicks pass-through */\n#nprogress {\n  pointer-events: none;\n}\n\n#nprogress .bar {\n  background: #29d;\n\n  position: fixed;\n  z-index: 1031;\n  top: 0;\n  left: 0;\n\n  width: 100%;\n  height: 2px;\n}\n\n/* Fancy blur effect */\n#nprogress .peg {\n  display: block;\n  position: absolute;\n  right: 0px;\n  width: 100px;\n  height: 100%;\n  box-shadow: 0 0 10px #29d, 0 0 5px #29d;\n  opacity: 1.0;\n\n  -webkit-transform: rotate(3deg) translate(0px, -4px);\n      -ms-transform: rotate(3deg) translate(0px, -4px);\n          transform: rotate(3deg) translate(0px, -4px);\n}\n\n/* Remove these to get rid of the spinner */\n#nprogress .spinner {\n  display: block;\n  position: fixed;\n  z-index: 1031;\n  top: 15px;\n  right: 15px;\n}\n\n#nprogress .spinner-icon {\n  width: 18px;\n  height: 18px;\n  box-sizing: border-box;\n\n  border: solid 2px transparent;\n  border-top-color: #29d;\n  border-left-color: #29d;\n  border-radius: 50%;\n\n  -webkit-animation: nprogress-spinner 400ms linear infinite;\n          animation: nprogress-spinner 400ms linear infinite;\n}\n\n.nprogress-custom-parent {\n  overflow: hidden;\n  position: relative;\n}\n\n.nprogress-custom-parent #nprogress .spinner,\n.nprogress-custom-parent #nprogress .bar {\n  position: absolute;\n}\n\n@-webkit-keyframes nprogress-spinner {\n  0%   { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n@keyframes nprogress-spinner {\n  0%   { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n", ""]);
 
 // exports
 
@@ -54547,10 +54558,6 @@ var render = function() {
     "div",
     {},
     [
-      _c("notifications", {
-        attrs: { position: "bottom right", classes: "vue-notification" }
-      }),
-      _vm._v(" "),
       _c("h2", [_vm._v("List of Articles")]),
       _vm._v(" "),
       _c(

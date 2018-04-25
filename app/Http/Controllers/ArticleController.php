@@ -63,6 +63,8 @@ class ArticleController extends Controller
             $article->image = 'default.jpg';
         }
 
+        event(new ArticleEvent($article, 'success'));
+
         // Return the response if query has been successful
         if($article->save()) {
             // Save image to public/files
@@ -98,31 +100,19 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-
-
         // Get singe articles
         $article = Article::findOrFail($id);
 
-
-
         $this->unlinkImage($article->image);
+
+        event(new ArticleEvent($article, 'error'));
 
         // If delete query has been successful
         if($article->delete()) {
-            // Create broadcast event
-            event(new ArticleEvent($article->title . ' has been deleted!'));
-
             // Return response
             return new ArticleResource($article);
         }
     }
-
-    // public function test()
-    // {
-    //     $message = 'test from event function';
-    //     event(new ArticleEvent($messageSD));
-    //     echo 'fired';
-    // }
 
     /* ========================================================================= *\
      * Helpers

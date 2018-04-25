@@ -1,6 +1,6 @@
 <template lang="html">
     <div class="" >
-        <notifications position="bottom right" classes="vue-notification"/>
+
         <h2>List of Articles</h2>
         <form id="form" @submit.prevent="storeArticle" class="mb-2">
             <div class="form-group">
@@ -90,8 +90,8 @@ export default {
                 ArticlesService.post(formData)
                     .then((response) => {
                         const article = (response.data).data
-                        this.$notify({type: 'success', title: "Article: " + article.title + " has been added"});
-                        this.getArticles();
+                        // this.$notify({type: 'success', title: "Article: " + article.title + " has been added"});
+                        // this.getArticles();
                         Nprogress.done();
                     });
             } else {
@@ -107,8 +107,8 @@ export default {
                 ArticlesService.post(formData)
                     .then((response) => {
                         const article = (response.data).data
-                        this.$notify({type: 'success', title: "Article: " + article.title + " has been updated"});
-                        this.getArticles();
+                        // this.$notify({type: 'success', title: "Article: " + article.title + " has been updated"});
+                        // this.getArticles();
                         Nprogress.done();
                     });
             }
@@ -145,8 +145,8 @@ export default {
                 ArticlesService.delete(id)
                     .then((response) => {
                         const article = (response.data).data
-                        this.$notify({type: 'error', title: "Article: " + article.title + " has been removed"});
-                        this.getArticles();
+                        // this.$notify({type: 'error', title: "Article: " + article.title + " has been removed"});
+                        // this.getArticles();
                         Nprogress.done();
                     });
             }
@@ -168,7 +168,13 @@ export default {
 
     mounted () {
         this.getArticles();
-        Nprogress.done()
+        Nprogress.done();
+
+        Echo.channel('article-channel')
+            .listen('ArticleEvent', (article) => {
+                this.getArticles();
+                this.$notify({type: article.type, title: "Article: " + article.title + " has been removed"});
+            });
     }
 }
 </script>

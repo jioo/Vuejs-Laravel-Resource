@@ -15,15 +15,17 @@ class ArticleEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $article;
+    public $type;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($article)
+    public function __construct($article, $type)
     {
-        return $this->article = $article;
+        $this->article = $article;
+        $this->type = $type;
     }
 
     /**
@@ -35,5 +37,19 @@ class ArticleEvent implements ShouldBroadcast
     {
         // return new PrivateChannel('channel-name');
         return new Channel('article-channel');
+    }
+
+    /**
+    * Get the data to broadcast.
+    *
+    * @return array
+    */
+    public function broadcastWith()
+    {
+        $params = [
+            'type' => $this->type
+        ];
+
+        return array_merge($this->article->toArray(), $params);
     }
 }

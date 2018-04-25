@@ -23,6 +23,7 @@
             <navbar></navbar>
             <div class="container">
                 <router-view></router-view>
+                <notifications position="bottom right" classes="vue-notification"/>
             </div>
         </div>
         <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
