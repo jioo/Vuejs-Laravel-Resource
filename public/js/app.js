@@ -15935,7 +15935,7 @@ if (inBrowser && window.Vue) {
 /* harmony default export */ __webpack_exports__["a"] = ({
     login: function login(user) {
         user.client_id = '2';
-        user.client_secret = 'X1FvyCRde5NZNGIy0bFritUR11C9udeDcMWOZcCc';
+        user.client_secret = 'wMwOgkto1bMRrYfg1B1OrMqS6k8olx1eS6i3sDEe';
         user.grant_type = "password";
         return Object(__WEBPACK_IMPORTED_MODULE_0__Api__["a" /* default */])().post('oauth/token', user);
     }
@@ -15955,18 +15955,13 @@ if (inBrowser && window.Vue) {
 
 /* harmony default export */ __webpack_exports__["a"] = (function () {
     var instance = __WEBPACK_IMPORTED_MODULE_0_axios___default.a.create({
-        baseURL: 'http://localhost/vue-laravel/public/',
-        headers: { 'Access-Control-Allow-Origin': '*' }
+        baseURL: APP_URL + '/vue-laravel/public/'
     });
 
     // Authorization header
     instance.interceptors.request.use(function (config) {
         config['headers'] = {
             'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-            // 'Access-Control-Allow-Origin': '*'
-            // 'Access-Control-Request-Method': 'GET, PUT, POST, PATCH, DELETE, OPTIONS',
-            // 'Access-Control-AllowHeaders': '*',
-            // 'X-Requested-With': 'XMLHttpRequest'
         };
         // NProgress.start();
         // console.log('starting..')
@@ -15978,7 +15973,6 @@ if (inBrowser && window.Vue) {
     // Show toast with message for non OK responses
     instance.interceptors.response.use(function (response) {
         // console.log('done..')
-
         // console.log(response.request.headers);
         return response;
     }, function (error) {
@@ -53103,7 +53097,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
         return {
             preview_image: '',
             file: '',
-            image_path: 'http://localhost/vue-laravel/public/files/',
+            image_path: APP_URL + '/vue-laravel/public/files/',
             articles: [],
             article: {
                 id: '',
@@ -53265,7 +53259,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
         Echo.channel('article-channel').listen('ArticleEvent', function (article) {
             _this2.getArticles();
-            _this2.$notify({ type: article.type, title: "Article: " + article.title + " has been removed" });
+            _this2.$notify({ type: article.type, title: article.message });
         });
     }
 });

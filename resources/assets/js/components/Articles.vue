@@ -50,7 +50,7 @@ export default {
         return {
             preview_image: '',
             file: '',
-            image_path: 'http://localhost/vue-laravel/public/files/',
+            image_path: APP_URL + '/vue-laravel/public/files/',
             articles: [],
             article: {
                 id: '',
@@ -173,7 +173,7 @@ export default {
         Echo.channel('article-channel')
             .listen('ArticleEvent', (article) => {
                 this.getArticles();
-                this.$notify({type: article.type, title: "Article: " + article.title + " has been removed"});
+                this.$notify({type: article.type, title: article.message});
             });
     }
 }

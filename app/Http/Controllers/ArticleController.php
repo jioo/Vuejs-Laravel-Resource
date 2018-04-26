@@ -63,8 +63,6 @@ class ArticleController extends Controller
             $article->image = 'default.jpg';
         }
 
-        event(new ArticleEvent($article, 'success'));
-
         // Return the response if query has been successful
         if($article->save()) {
             // Save image to public/files
@@ -72,6 +70,16 @@ class ArticleController extends Controller
                 $destinationPath = public_path('/files');
                 $image->move($destinationPath, $image_file_name);
             }
+
+            // Trigger an event for notification
+            $message = ($request->isMethod('post'))
+                ? 'A new article has been added: ' . $request->input('title')
+                : 'Article: ' . $request->input('title') . ' has been updated';
+            $notification = [
+                'type' => 'success',
+                'message' => $message
+            ];
+            event(new ArticleEvent($article, $notification));
 
             return new ArticleResource($article);
         }
@@ -105,7 +113,12 @@ class ArticleController extends Controller
 
         $this->unlinkImage($article->image);
 
-        event(new ArticleEvent($article, 'error'));
+        // Trigger an event for notification
+        $notification = [
+            'type' => 'error',
+            'message' => 'Article: ' . $article->title . ' has been removed'
+        ];
+        event(new ArticleEvent($article, $notification));
 
         // If delete query has been successful
         if($article->delete()) {

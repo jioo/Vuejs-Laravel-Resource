@@ -21,8 +21,8 @@ Route::get('article/{id}', 'ArticleController@show');
 Route::get('test', 'ArticleController@test');
 
 // Athenticated api
-// Route::group(['middleware' => 'auth:api'], function () {
+//Route::group(['middleware' => 'auth:api'], function () {
     Route::post('article', 'ArticleController@store');
     Route::put('article', 'ArticleController@store');
     Route::delete('article/{id}', 'ArticleController@destroy');
-// });
+//});

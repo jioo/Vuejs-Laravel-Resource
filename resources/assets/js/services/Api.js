@@ -3,22 +3,13 @@ import Nprogress from 'nprogress'
 
 export default () => {
     const instance = axios.create({
-        baseURL: 'http://localhost/vue-laravel/public/',
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': '*',
-            'Access-Control-AllowHeaders': '*'
-        }
+        baseURL: APP_URL + '/vue-laravel/public/'
     })
 
     // Authorization header
     instance.interceptors.request.use(function (config) {
         config['headers'] = {
-            'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
-            // 'Access-Control-Allow-Origin': '*'
-            // 'Access-Control-Request-Method': 'GET, PUT, POST, PATCH, DELETE, OPTIONS',
-            // 'Access-Control-AllowHeaders': '*',
-            // 'X-Requested-With': 'XMLHttpRequest'
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
         };
         // NProgress.start();
         // console.log('starting..')
@@ -28,7 +19,6 @@ export default () => {
     // Show toast with message for non OK responses
     instance.interceptors.response.use(response => {
         // console.log('done..')
-
         // console.log(response.request.headers);
         return response
     }, error => {
