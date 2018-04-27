@@ -15,13 +15,19 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Get list of articles with pagination config
-        $articles = Article::orderBy('created_at', 'desc')->paginate(5);
+        // Get list of articles with filter & pagination config
+        $articles = new Article();
+        $articles->orderBy('created_at', 'desc');
+        if($request->has('search')) {
+            $result = $articles->where('title', 'LIKE', '%'.$request->search.'%')->paginate(6);
+        } else {
+            $result = $articles->paginate(6);
+        }
 
         // Return a collection with resource
-        return ArticleResource::collection($articles);
+        return ArticleResource::collection($result);
     }
 
     /**

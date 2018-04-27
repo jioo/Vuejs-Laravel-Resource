@@ -2,8 +2,8 @@ import Api from './Api'
 
 export default {
     get (url) {
-        url = url || 'articles';
-        return Api().get('api/' + url)
+        url = url || 'api/articles';
+        return Api().get(url)
     },
     show (id) {
         return Api().get(`api/article/${id}`)

@@ -1,49 +1,56 @@
 <template lang="html">
-    <div class="" >
+    <div class="content" >
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-5">
+                    <form id="form" @submit.prevent="storeArticle" class="mb-2" v-if="user">
+                        <div class="form-group">
+                            <input type="text" class="form-control mb-2" placeholder="Title" v-model="article.title" required>
+                            <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea required>
+                            <input type="file" id="file" ref="file" @change="previewImage"/>
+                            <div class="row">
+                                <div class="col-md-6 image-preview" v-if="preview_image.length > 0">
+                                    <img class="img-fluid" :src="preview_image" style="max-height:200px;">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-light btn-block">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-        <h2>List of Articles</h2>
-        <form id="form" @submit.prevent="storeArticle" class="mb-2">
-            <div class="form-group">
-                <input type="text" class="form-control mb-2" placeholder="Title" v-model="article.title" required>
-                <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea required>
-                <input type="file" id="file" ref="file" @change="previewImage"/>
-                <div class="row">
-                    <div class="col-md-6 image-preview" v-if="preview_image.length > 0">
-                        <img class="img-fluid" :src="preview_image" style="max-height:200px;">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 mb-2" v-for="article in articles" v-bind:key="articles.id">
+                    <div class="card card-body">
+                        <img class="img-fluid" v-bind:src="image_path + article.image" style="max-height: 400px;">
+                        <h3>{{ article.title }}</h3>
+                        <p>{{ article.body }}</p>
+                        <small>Category: {{ article.category_name }}</small>
+                        <hr v-if="user">
+                        <button type="button" name="button" class="btn btn-warning mb-2" @click="editArticle(article)" v-if="user">Edit</button>
+                        <button type="button" name="button" class="btn btn-danger" @click="deleteArticle(article.id)" v-if="user">Delete</button>
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-light btn-block">Save</button>
-        </form>
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li class="page-item" v-bind:class="[{disabled: !pagination.prev_page_url}]">
-                    <a class="page-link" href="#" @click="getArticles(pagination.prev_page_url)">Previous</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link text-dark" href="#">Page {{ pagination.current_page }} of {{ pagination.last_page }}</a>
-                </li>
-                <li class="page-item" v-bind:class="[{disabled: !pagination.next_page_url}]">
-                    <a class="page-link" href="#" @click="getArticles(pagination.next_page_url)">Next</a>
-                </li>
-            </ul>
-        </nav>
-        <div class="card card-body mb-2" v-for="article in articles" v-bind:key="articles.id">
-            <h3>{{ article.title }}</h3>
-            <p>{{ article.body }}</p>
-            <img class="img-fluid" v-bind:src="image_path + article.image" style="max-height: 400px;">
-            <hr>
-            <button type="button" name="button" class="btn btn-warning mb-2" @click="editArticle(article)">Edit</button>
-            <button type="button" name="button" class="btn btn-danger" @click="deleteArticle(article.id)">Delete</button>
         </div>
 
+        <infinite-loading @infinite="infiniteHandler" ref="infiniteLoading">
+            <span slot="no-more">
+            </span>
+        </infinite-loading>
     </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import ArticlesService from '../services/ArticlesService'
+import { EventBus } from '../event-bus/event-bus';
 import Nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
+import InfiniteLoading from 'vue-infinite-loading';
 
 export default {
     data () {
@@ -57,12 +64,34 @@ export default {
                 title: '',
                 body: ''
             },
-            pagination: {},
             edit: false
         };
     },
 
+    computed: {
+        ...mapState(['user', 'filter'])
+    },
+
+    components: {
+        InfiniteLoading,
+    },
+
     methods: {
+        infiniteHandler($state) {
+            let current_page = parseInt(this.articles.length / 6) + 1;
+            ArticlesService.get('api/articles?search=' + this.filter.search + '&page=' + current_page)
+                .then(({ data }) => {
+                    if (data.data.length) {
+                        this.articles = this.articles.concat(data.data);
+                        $state.loaded();
+                        if (data.data.length / 20 === 10) {
+                            $state.complete();
+                        }
+                    } else {
+                        $state.complete();
+                    }
+                });
+        },
         async getArticles(url) {
             let response = (await ArticlesService.get(url)).data;
             this.articles = (response).data;
@@ -90,8 +119,6 @@ export default {
                 ArticlesService.post(formData)
                     .then((response) => {
                         const article = (response.data).data
-                        // this.$notify({type: 'success', title: "Article: " + article.title + " has been added"});
-                        // this.getArticles();
                         Nprogress.done();
                     });
             } else {
@@ -107,8 +134,6 @@ export default {
                 ArticlesService.post(formData)
                     .then((response) => {
                         const article = (response.data).data
-                        // this.$notify({type: 'success', title: "Article: " + article.title + " has been updated"});
-                        // this.getArticles();
                         Nprogress.done();
                     });
             }
@@ -162,19 +187,19 @@ export default {
         }
     },
 
-    created() {
-        Nprogress.start()
-    },
-
     mounted () {
-        this.getArticles();
-        Nprogress.done();
-
         Echo.channel('article-channel')
             .listen('ArticleEvent', (article) => {
                 this.getArticles();
                 this.$notify({type: article.type, title: article.message});
             });
+
+        EventBus.$on('filter-changed', () => {
+            this.articles = [];
+            this.$nextTick(() => {
+                this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
+            });
+        });
     }
 }
 </script>
@@ -205,5 +230,9 @@ export default {
     background: #68CD86;
     border-left-color: #42A85F;
   }
+}
+
+.content {
+    padding-top: 90px;
 }
 </style>

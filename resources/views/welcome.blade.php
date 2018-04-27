@@ -24,7 +24,7 @@
     <body>
         <div id="app">
             <navbar></navbar>
-            <div class="container">
+            <div class="container-fluid">
                 <router-view></router-view>
                 <notifications position="bottom right" classes="vue-notification"/>
             </div>

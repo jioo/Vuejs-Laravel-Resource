@@ -11,7 +11,11 @@ export default new Vuex.Store({
     ],
 
     state: {
-        user: null
+        user: null,
+        filter: {
+            search: '',
+            category: ''
+        }
     },
 
     mutations: {
@@ -20,6 +24,14 @@ export default new Vuex.Store({
         },
         logout(state) {
             state.user = null
+        },
+        addFilter(state, filter) {
+            state.filter.search = filter.search
+            state.filter.category = filter.category
+        },
+        resetFilter(state) {
+            state.filter.search = ''
+            state.filter.category = ''
         }
     },
 
@@ -35,6 +47,12 @@ export default new Vuex.Store({
         logout ({commit}) {
             localStorage.removeItem('access_token')
             commit('logout')
+        },
+        addFilter ({commit}, filter) {
+            commit('addFilter', filter)
+        },
+        resetFilter ({commit}) {
+            commit('resetFilter')
         }
     }
 })

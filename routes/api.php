@@ -26,3 +26,5 @@ Route::get('test', 'ArticleController@test');
     Route::put('article', 'ArticleController@store');
     Route::delete('article/{id}', 'ArticleController@destroy');
 //});
+
+Route::resource('category', 'CategoryController', ['except' => ['store', 'destroy']]);
