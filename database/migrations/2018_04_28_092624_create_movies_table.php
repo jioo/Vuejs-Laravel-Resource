@@ -19,7 +19,7 @@ class CreateMoviesTable extends Migration
             $table->foreign('category_id')->references('id')->on('categories');
             $table->string('title');
             $table->string('year');
-            $table->string('youtubeId');
+            $table->string('youtubeId')->default('');
             $table->string('image');
             $table->timestamps();
         });

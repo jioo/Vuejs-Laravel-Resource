@@ -52,7 +52,9 @@ class MovieController extends Controller
         $movie->title = $request->input('title');
         $movie->category_id = $request->input('category_id');
         $movie->year = $request->input('year');
-        $movie->youtubeId = $request->input('youtubeId');
+        $movie->youtubeId = (!empty($request->input('youtubeId')))
+            ? $request->input('youtubeId')
+            : '';
 
         // Handle file request
         // Check if input file has value
