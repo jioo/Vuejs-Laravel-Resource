@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Article;
-use App\Events\ArticleEvent;
-use App\Http\Resources\Article as ArticleResource;
+use App\Movie;
+use App\Events\MovieEvent;
+use App\Http\Resources\Movie as MovieResource;
 
-class ArticleController extends Controller
+class MovieController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,17 +17,20 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        // Get list of articles with filter & pagination config
-        $articles = new Article();
-        $articles->orderBy('created_at', 'desc');
-        if($request->has('search')) {
-            $result = $articles->where('title', 'LIKE', '%'.$request->search.'%')->paginate(6);
-        } else {
-            $result = $articles->paginate(6);
+        // Get list of movies with filter & pagination config
+        $movies =  Movie::query();
+        $movies->orderBy('created_at', 'desc');
+
+        if(!empty($request->search)) {
+            $movies->where('title', 'LIKE', '%'.$request->search.'%');
         }
 
-        // Return a collection with resource
-        return ArticleResource::collection($result);
+        if (!empty($request->category) && $request->category !== 0) {
+            $movies->where('category_id', $request->category);
+        }
+
+        $result = $movies->paginate(8);
+        return MovieResource::collection($result);
     }
 
     /**
@@ -40,14 +43,16 @@ class ArticleController extends Controller
     {
         $upload_file = FALSE;
         // Check if request is a put / post
-        $article = $request->isMethod('put')
-            ? Article::findOrFail($request->id)
-            : new Article;
+        $movie = $request->isMethod('put')
+            ? Movie::findOrFail($request->id)
+            : new Movie;
 
-        // Populate article with requests
-        $article->id = $request->input('id');
-        $article->title = $request->input('title');
-        $article->body = $request->input('body');
+        // Populate Movie with requests
+        $movie->id = $request->input('id');
+        $movie->title = $request->input('title');
+        $movie->category_id = $request->input('category_id');
+        $movie->year = $request->input('year');
+        $movie->youtubeId = $request->input('youtubeId');
 
         // Handle file request
         // Check if input file has value
@@ -57,20 +62,20 @@ class ArticleController extends Controller
 
             // Delete the previous image on update
             if($request->isMethod('put')) {
-                $this->unlinkImage($article->image);
+                $this->unlinkImage($movie->image);
             }
 
             // Save the new image file name
-            $article->image = $image_file_name;
+            $movie->image = $image_file_name;
             $upload_file = TRUE;
 
         } else if ($request->isMethod('post')) {
             // Set default image if file is empty
-            $article->image = 'default.jpg';
+            $movie->image = 'default.jpg';
         }
 
         // Return the response if query has been successful
-        if($article->save()) {
+        if($movie->save()) {
             // Save image to public/files
             if($upload_file) {
                 $destinationPath = public_path('/files');
@@ -79,15 +84,17 @@ class ArticleController extends Controller
 
             // Trigger an event for notification
             $message = ($request->isMethod('post'))
-                ? 'A new article has been added: ' . $request->input('title')
-                : 'Article: ' . $request->input('title') . ' has been updated';
+                ? 'A new Movie has been added: ' . $request->input('title')
+                : $request->input('title') . ' has been updated';
+            $action = ($request->isMethod('post')) ? 'create': 'update';
             $notification = [
+                'action' => $action,
                 'type' => 'success',
                 'message' => $message
             ];
-            event(new ArticleEvent($article, $notification));
+            event(new MovieEvent($movie, $notification));
 
-            return new ArticleResource($article);
+            return new MovieResource($movie);
         }
     }
 
@@ -99,11 +106,9 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        // Get singe articles
-        $article = Article::findOrFail($id);
-
-        // Return response
-        return new ArticleResource($article);
+        // Get single movies
+        $movie = Movie::findOrFail($id);
+        return new MovieResource($movie);
     }
 
     /**
@@ -114,22 +119,22 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        // Get singe articles
-        $article = Article::findOrFail($id);
+        // Get singe Movies
+        $movie = Movie::findOrFail($id);
 
-        $this->unlinkImage($article->image);
+        $this->unlinkImage($movie->image);
 
         // Trigger an event for notification
         $notification = [
+            'action' => 'delete',
             'type' => 'error',
-            'message' => 'Article: ' . $article->title . ' has been removed'
+            'message' => 'Movie: ' . $movie->title . ' has been removed'
         ];
-        event(new ArticleEvent($article, $notification));
+        event(new MovieEvent($movie, $notification));
 
         // If delete query has been successful
-        if($article->delete()) {
-            // Return response
-            return new ArticleResource($article);
+        if($movie->delete()) {
+            return new MovieResource($movie);
         }
     }
 

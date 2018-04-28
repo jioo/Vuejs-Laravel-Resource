@@ -2,11 +2,12 @@
 
 use Faker\Generator as Faker;
 
-$factory->define(App\Article::class, function (Faker $faker) {
+$factory->define(App\Movie::class, function (Faker $faker) {
     return [
         'category_id' => 0,
-        'title' => $faker->text(50),
-        'body' => $faker->text(200),
+        'title' => $faker->text(20),
+        'year' => '2018',
+        'youtubeId' => '',
         'image' => 'default.jpg'
     ];
 });

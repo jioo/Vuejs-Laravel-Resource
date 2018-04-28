@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Movie extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,7 +12,16 @@ class Category extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'title', 'year', 'youtubeId'
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'category_id'  => 'int',
     ];
 
     /* ========================================================================= *\
@@ -20,10 +29,10 @@ class Category extends Model
     \* ========================================================================= */
 
     /**
-     * Category has many article
+     * Belongs to category
      */
-     public function movies()
-     {
-         return $this->hasMany(Movie::class);
-     }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

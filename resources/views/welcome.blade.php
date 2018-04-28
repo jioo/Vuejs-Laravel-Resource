@@ -8,7 +8,7 @@
         <script type="text/javascript">
             window.Laravel = { csrfToken: '{{ csrf_token() }}' }
         </script>
-        <title>Articles</title>
+        <title>Movies</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">

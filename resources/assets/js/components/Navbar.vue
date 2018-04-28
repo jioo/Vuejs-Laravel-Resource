@@ -2,7 +2,7 @@
     <div>
         <nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-info mb-2">
             <div class="container-fluid">
-                <router-link to="/" class="navbar-brand">Articles</router-link>
+                <router-link to="/" class="navbar-brand">Movies</router-link>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -25,7 +25,7 @@
                         </li>
                     </ul>
                     <form class="form-inline my-2 my-lg-0" @submit.prevent="search">
-                        <select class="custom-select mr-2" >
+                        <select class="custom-select mr-2" @change="categoryChange" v-model="newFilter.category">
                             <option value="0" selected>All Categories</option>
                             <option v-for="category in categories" v-bind:key="category.id" :value="category.id">{{ category.name }}</option>
                         </select>
@@ -49,8 +49,8 @@ export default {
         return {
             categories: [],
             newFilter: {
-                search: null,
-                category: null
+                search: '',
+                category: 0
             }
         }
     },
@@ -74,6 +74,10 @@ export default {
         },
         reset () {
             this.resetFilter();
+            EventBus.$emit('filter-changed');
+        },
+        categoryChange () {
+            this.addFilter(this.newFilter);
             EventBus.$emit('filter-changed');
         }
     },

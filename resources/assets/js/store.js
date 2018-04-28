@@ -14,7 +14,7 @@ export default new Vuex.Store({
         user: null,
         filter: {
             search: '',
-            category: ''
+            category: 0
         }
     },
 
@@ -31,7 +31,7 @@ export default new Vuex.Store({
         },
         resetFilter(state) {
             state.filter.search = ''
-            state.filter.category = ''
+            state.filter.category = 0
         }
     },
 

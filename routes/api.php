@@ -15,16 +15,14 @@ use Illuminate\Http\Request;
 
 Route::post('register', 'UserController@register');
 
-Route::get('articles', 'ArticleController@index');
-Route::get('article/{id}', 'ArticleController@show');
-
-Route::get('test', 'ArticleController@test');
+Route::get('movies', 'MovieController@index');
+Route::get('movie/{id}', 'MovieController@show');
 
 // Athenticated api
 //Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('article', 'ArticleController@store');
-    Route::put('article', 'ArticleController@store');
-    Route::delete('article/{id}', 'ArticleController@destroy');
+    Route::post('movie', 'MovieController@store');
+    Route::put('movie', 'MovieController@store');
+    Route::delete('movie/{id}', 'MovieController@destroy');
 //});
 
 Route::resource('category', 'CategoryController', ['except' => ['store', 'destroy']]);

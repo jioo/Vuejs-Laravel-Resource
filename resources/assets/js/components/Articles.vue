@@ -2,11 +2,16 @@
     <div class="content" >
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-5">
-                    <form id="form" @submit.prevent="storeArticle" class="mb-2" v-if="user">
+                <div class="col-md-6">
+                    <form id="form" @submit.prevent="storeMovie" class="mb-2" v-if="user">
                         <div class="form-group">
-                            <input type="text" class="form-control mb-2" placeholder="Title" v-model="article.title" required>
-                            <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea required>
+                            <input type="text" class="form-control mb-2" placeholder="Title" v-model="movie.title" required>
+                            <input type="number" class="form-control mb-2" placeholder="Year" v-model="movie.year" required>
+                            <input type="text" class="form-control mb-2" placeholder="Youtube Id" v-model="movie.youtubeId">
+                            <select class="custom-select mr-2" v-model="movie.category_id" required >
+                                <option value="" hidden> Choose One </option>
+                                <option v-for="category in categories" v-bind:key="category.id" :value="category.id">{{ category.name }}</option>
+                            </select>
                             <input type="file" id="file" ref="file" @change="previewImage"/>
                             <div class="row">
                                 <div class="col-md-6 image-preview" v-if="preview_image.length > 0">
@@ -23,15 +28,14 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-4 mb-2" v-for="article in articles" v-bind:key="articles.id">
+                <div class="col-md-3 mb-2" v-for="movie in movies" v-bind:key="movies.id">
                     <div class="card card-body">
-                        <img class="img-fluid" v-bind:src="image_path + article.image" style="max-height: 400px;">
-                        <h3>{{ article.title }}</h3>
-                        <p>{{ article.body }}</p>
-                        <small>Category: {{ article.category_name }}</small>
+                        <img class="img-fluid" v-bind:src="image_path + movie.image" style="max-height: 400px;">
+                        <h3>{{ movie.title }}</h3>
+                        <small>Category: {{ movie.category_name }}</small>
                         <hr v-if="user">
-                        <button type="button" name="button" class="btn btn-warning mb-2" @click="editArticle(article)" v-if="user">Edit</button>
-                        <button type="button" name="button" class="btn btn-danger" @click="deleteArticle(article.id)" v-if="user">Delete</button>
+                        <button type="button" name="button" class="btn btn-warning mb-2" @click="editMovie(movie)" v-if="user">Edit</button>
+                        <button type="button" name="button" class="btn btn-danger" @click="deleteMovie(movie.id)" v-if="user">Delete</button>
                     </div>
                 </div>
             </div>
@@ -46,24 +50,28 @@
 
 <script>
 import { mapState } from 'vuex'
-import ArticlesService from '../services/ArticlesService'
 import { EventBus } from '../event-bus/event-bus';
+import MovieService from '../services/MovieService'
+import CategoryService from '../services/CategoryService'
+import InfiniteLoading from 'vue-infinite-loading';
 import Nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
-import InfiniteLoading from 'vue-infinite-loading';
 
 export default {
     data () {
         return {
-            preview_image: '',
-            file: '',
             image_path: APP_URL + '/vue-laravel/public/files/',
-            articles: [],
-            article: {
+            movies: [],
+            movie: {
                 id: '',
+                category_id: '',
                 title: '',
-                body: ''
+                year: '',
+                youtubeId: ''
             },
+            categories: [],
+            file: '',
+            preview_image: '',
             edit: false
         };
     },
@@ -78,25 +86,25 @@ export default {
 
     methods: {
         infiniteHandler($state) {
-            let current_page = parseInt(this.articles.length / 6) + 1;
-            ArticlesService.get('api/articles?search=' + this.filter.search + '&page=' + current_page)
+            let current_page = parseInt(this.movies.length / 8) + 1;
+            let filter = {
+                page: current_page,
+                search: this.filter.search,
+                category: this.filter.category
+            };
+            console.log(filter);
+            MovieService.get(filter)
                 .then(({ data }) => {
                     if (data.data.length) {
-                        this.articles = this.articles.concat(data.data);
+                        this.movies = this.movies.concat(data.data);
                         $state.loaded();
-                        if (data.data.length / 20 === 10) {
+                        if (data.meta.last_page === current_page) {
                             $state.complete();
                         }
                     } else {
                         $state.complete();
                     }
                 });
-        },
-        async getArticles(url) {
-            let response = (await ArticlesService.get(url)).data;
-            this.articles = (response).data;
-            this.makePagination(await response.links, await response.meta);
-            this.resetForm();
         },
         makePagination(links, meta) {
             let pagination = {
@@ -107,23 +115,26 @@ export default {
             }
             this.pagination = pagination;
         },
-        storeArticle() {
+        storeMovie() {
             Nprogress.start();
             let formData = new FormData();
-            formData.append('title', this.article.title);
-            formData.append('body', this.article.body);
+            formData.append('title', this.movie.title);
+            formData.append('category_id', this.movie.category_id);
+            formData.append('year', this.movie.year);
+            formData.append('youtubeId', this.movie.youtubeId);
             formData.append('file', this.file);
 
             if(!this.edit) {
-                // Insert article
-                ArticlesService.post(formData)
+                // Insert movie
+
+                MovieService.post(formData)
                     .then((response) => {
-                        const article = (response.data).data
+                        const movie = (response.data).data
                         Nprogress.done();
                     });
             } else {
-                // Update Article
-                formData.append('id', this.article.id);
+                // Update movie
+                formData.append('id', this.movie.id);
 
                 // Laravel BUG: Input from PUT requests sent as multipart/form-data:
                 // solution: You should send POST and set _method to
@@ -131,9 +142,9 @@ export default {
                 // https://github.com/laravel/framework/issues/13457
                 formData.append('_method', 'PUT');
 
-                ArticlesService.post(formData)
+                MovieService.post(formData)
                     .then((response) => {
-                        const article = (response.data).data
+                        const movie = (response.data).data
                         Nprogress.done();
                     });
             }
@@ -155,51 +166,90 @@ export default {
         removeImage: function (item) {
             item.image = false;
         },
-        editArticle(article) {
+        editMovie(movie) {
             $('html, body').animate({scrollTop : 0},500);
 
-            this.article.id = article.id;
-            this.article.title = article.title;
-            this.article.body = article.body;
-            this.preview_image = this.image_path + article.image;
+            this.movie.id = movie.id;
+            this.movie.category_id = movie.category_id;
+            this.movie.title = movie.title;
+            this.movie.year = movie.year;
+            this.movie.youtubeId = movie.youtubeId;
+            this.preview_image = this.image_path + movie.image;
             this.edit = true;
         },
-        deleteArticle(id) {
+        deleteMovie(id) {
             Nprogress.start();
             if(confirm('Are you sure you want to delete this?')) {
-                ArticlesService.delete(id)
+                MovieService.delete(id)
                     .then((response) => {
-                        const article = (response.data).data
-                        // this.$notify({type: 'error', title: "Article: " + article.title + " has been removed"});
-                        // this.getArticles();
+                        const movie = (response.data).data
                         Nprogress.done();
                     });
             }
         },
         resetForm() {
-            this.article.id = '';
-            this.article.title = '';
-            this.article.body = '';
+            this.movie.id = '';
+            this.movie.title = '';
+            this.movie.year = '';
+            this.movie.youtubeId = '';
             this.file = '';
             this.preview_image = '';
             this.$refs.file.value = null;
             this.edit = false;
-        }
-    },
-
-    mounted () {
-        Echo.channel('article-channel')
-            .listen('ArticleEvent', (article) => {
-                this.getArticles();
-                this.$notify({type: article.type, title: article.message});
-            });
-
-        EventBus.$on('filter-changed', () => {
-            this.articles = [];
+        },
+        resetInfiniteLoading() {
+            this.movies = [];
             this.$nextTick(() => {
                 this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
             });
+        },
+        updateList(movie) {
+            let index = this.movies.findIndex(x => x.id == movie.id);
+            let new_movie = {
+                id: movie.id,
+                category_id: movie.category_id,
+                category_name: movie.category_name,
+                title: movie.title,
+                year: movie.year,
+                youtubeId: movie.youtubeId,
+                image: movie.image
+            };
+
+            switch (movie.action) {
+                case 'create':
+                    this.movies.unshift(new_movie);
+                    break;
+
+                case 'update':
+                    this.movies.splice(index, 1, new_movie);
+                    break;
+
+                case 'delete':
+                    this.movies.splice(index, 1);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    },
+
+    async mounted () {
+        Echo.channel('movie-channel')
+            .listen('MovieEvent', (movie) => {
+                console.log(movie);
+                this.updateList(movie);
+                if (this.user) {
+                    this.resetForm();
+                }
+                this.$notify({type: movie.type, title: movie.message});
+            });
+
+        EventBus.$on('filter-changed', () => {
+            this.resetInfiniteLoading();
         });
+
+        this.categories = ((await CategoryService.get()).data).data
     }
 }
 </script>
