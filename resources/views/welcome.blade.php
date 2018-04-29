@@ -11,25 +11,61 @@
         <title>Movies</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+        <!-- <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous"> -->
+        <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+        <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" rel="stylesheet">
 
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script> -->
         <script type="text/javascript">
             const APP_URL = "<?php echo env('APP_URL') ?>";
         </script>
     </head>
     <body>
         <div id="app">
-            <navbar></navbar>
-            <div class="container-fluid">
+            <v-app dark id="inspire">
+                <navbar></navbar>
                 <router-view></router-view>
                 <notifications position="bottom right" classes="vue-notification"/>
-            </div>
+            </v-app>
+            <!-- <div class="container-fluid">
+                <router-view></router-view>
+                <notifications position="bottom right" classes="vue-notification"/>
+            </div> -->
         </div>
         <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
+        <style media="screen">
+        .vue-notification {
+            padding: 15px;
+            margin: 0 5px 5px;
 
+            font-size: 16px;
+
+            color: #ffffff;
+            background: #44A4FC;
+            border-left: 5px solid #187FE7;
+
+            &.warn {
+                background: #ffb648;
+                border-left-color: #f48a06;
+            }
+
+            &.error {
+                background: #E54D42;
+                border-left-color: #B82E24;
+            }
+
+            &.success {
+                background: #68CD86;
+                border-left-color: #42A85F;
+            }
+        }
+
+        .content {
+            padding-top: 90px;
+        }
+        </style>
     </body>
 </html>

@@ -26,6 +26,7 @@ export default () => {
       //   text: error.response.data.message || 'Request error status: ' + error.response.status,
       //   type: 'danger'
       // })
+      alert(error.response.data.message)
       return Promise.reject(error)
     })
 

@@ -8,14 +8,19 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
+import VueYouTubeEmbed from 'vue-youtube-embed'
 import { sync } from 'vuex-router-sync'
 import store from './store'
 import router from './router'
 import Notifications from 'vue-notification'
 import 'nprogress/nprogress.css'
+import 'vuetify/dist/vuetify.min.css'
 
+Vue.use(Vuetify);
 Vue.use(VueRouter);
+Vue.use(VueYouTubeEmbed);
 Vue.use(Notifications);
 
 sync(store, router)

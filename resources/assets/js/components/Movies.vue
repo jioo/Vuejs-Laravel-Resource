@@ -1,65 +1,151 @@
 <template lang="html">
-    <div class="content" >
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <form id="form" @submit.prevent="storeMovie" class="mb-2" v-if="user">
-                        <div class="form-group">
-                            <input type="text" class="form-control mb-2" placeholder="Title" v-model="movie.title" required>
-                            <input type="number" class="form-control mb-2" placeholder="Year" v-model="movie.year" required>
-                            <input type="text" class="form-control mb-2" placeholder="Youtube Id" v-model="movie.youtubeId">
-                            <select class="custom-select mr-2" v-model="movie.category_id" required >
-                                <option value="" hidden> Choose One </option>
-                                <option v-for="category in categories" v-bind:key="category.id" :value="category.id">{{ category.name }}</option>
-                            </select>
+    <v-content>
+        <v-container grid-list-md>
+            <v-dialog dark v-model="movieDialog" persistent max-width="800px">
+                <v-card>
+                    <v-card-title>
+                        MOVIE PANEL
+                        <v-spacer></v-spacer>
+                        <v-btn icon @click.native="movieDialog = false" dark>
+                            <v-icon>close</v-icon>
+                        </v-btn>
+                    </v-card-title>
+
+                    <v-divider></v-divider>
+
+                    <v-card-text>
+                        <v-form v-model="valid" ref="form">
+                            <v-text-field
+                            type="text"
+                            label="Title"
+                            v-model="movie.title"
+                            required
+                            :rules="[required]"
+                            ></v-text-field>
+
+                            <v-text-field
+                            type="number"
+                            label="Year"
+                            v-model="movie.year"
+                            required
+                            :rules="[required]"
+                            ></v-text-field>
+
+                            <v-text-field
+                            type="text"
+                            label="Youtube Id"
+                            v-model="movie.youtubeId"
+                            ></v-text-field>
+
+                            <v-select
+                            label="Select"
+                            :items="categories"
+                            v-model="movie.category_id"
+                            required
+                            :rules="[required]"
+                            ></v-select>
+
                             <input type="file" id="file" ref="file" @change="previewImage"/>
                             <div class="row">
                                 <div class="col-md-6 image-preview" v-if="preview_image.length > 0">
                                     <img class="img-fluid" :src="preview_image" style="max-height:200px;">
                                 </div>
                             </div>
-                        </div>
-                        <button type="submit" class="btn btn-light btn-block">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
 
+                            <v-btn color="success" @click="storeMovie">
+                                Submit
+                            </v-btn>
+                        </v-form>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-3 mb-2" v-for="movie in movies" v-bind:key="movies.id">
-                    <div class="card card-body">
-                        <img class="img-fluid" v-bind:src="image_path + movie.image" style="max-height: 400px;">
-                        <h3>{{ movie.title }}</h3>
-                        <small>Category: {{ movie.category_name }}</small>
-                        <hr v-if="user">
-                        <button type="button" name="button" class="btn btn-warning mb-2" @click="editMovie(movie)" v-if="user">Edit</button>
-                        <button type="button" name="button" class="btn btn-danger" @click="deleteMovie(movie.id)" v-if="user">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <v-dialog
+              v-model="confirmDialog"
+              max-width="500px"
+              transition="dialog-transition">
+                <v-card>
+                    <v-card-text primary class="title">
+                        Are you sure you want to delete this?
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="error" @click="deleteMovie">
+                            Delete
+                            <v-icon>delete</v-icon>
+                        </v-btn>
+                        <v-btn light @click.native="confirmDialog = false">
+                            Cancel
+                            <v-icon>remove_circle</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
 
+            <v-dialog
+              v-model="viewDialog"
+              max-width="670px"
+              transition="dialog-transition"
+            >
+                <v-card>
+                    <v-card-text>
+                        <youtube :video-id="movie.youtubeId" @ready="ready"></youtube>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+
+            <v-layout row wrap>
+                <v-flex d-flex xs12 sm6 md3 v-for="movie in movies" v-bind:key="movies.id">
+                    <v-card color="grey darken-3" dark>
+                        <v-card-text>
+                            <div class="title mb-1">{{ movie.title }}</div>
+                            <div class="subheading mb-1">{{ movie.category_name }}</div>
+                            <div class="subheading mb-2">{{ movie.year }}</div>
+                            <img v-bind:src="image_path + movie.image" style="max-height: 600px; width:100%;">
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn icon>
+                                <v-icon>file_download</v-icon>
+                            </v-btn>
+                            <v-btn icon @click="viewMovie(movie.youtubeId)" v-if="movie.youtubeId">
+                                <v-icon>theaters</v-icon>
+                            </v-btn>
+                            <v-btn icon @click="editMovie(movie)" v-if="user">
+                                <v-icon >mode_edit</v-icon>
+                            </v-btn>
+                            <v-btn icon @click="confirmDelete(movie.id)" v-if="user">
+                                <v-icon>delete</v-icon>
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </v-container>
         <infinite-loading @infinite="infiniteHandler" ref="infiniteLoading">
             <span slot="no-more">
             </span>
         </infinite-loading>
-    </div>
+    </v-content>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { EventBus } from '../event-bus/event-bus';
+import { EventBus } from '../event-bus/event-bus'
 import MovieService from '../services/MovieService'
 import CategoryService from '../services/CategoryService'
-import InfiniteLoading from 'vue-infinite-loading';
+import InfiniteLoading from 'vue-infinite-loading'
 import Nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 export default {
     data () {
         return {
+            movieDialog: false,
+            viewDialog: false,
+            confirmDialog: false,
+            valid: false,
+            edit: false,
             image_path: APP_URL + '/vue-laravel/public/files/',
             movies: [],
             movie: {
@@ -72,8 +158,13 @@ export default {
             categories: [],
             file: '',
             preview_image: '',
-            edit: false
-        };
+            youtubePlayer: null,
+            required: (value) => !!value || 'This field is required.'
+        }
+    },
+
+    props: {
+        source: String
     },
 
     computed: {
@@ -92,7 +183,6 @@ export default {
                 search: this.filter.search,
                 category: this.filter.category
             };
-            console.log(filter);
             MovieService.get(filter)
                 .then(({ data }) => {
                     if (data.data.length) {
@@ -116,6 +206,10 @@ export default {
             this.pagination = pagination;
         },
         storeMovie() {
+            if(!this.$refs.form.validate()) {
+                return false;
+            }
+
             Nprogress.start();
             let formData = new FormData();
             formData.append('title', this.movie.title);
@@ -126,11 +220,11 @@ export default {
 
             if(!this.edit) {
                 // Insert movie
-
                 MovieService.post(formData)
                     .then((response) => {
                         const movie = (response.data).data
                         Nprogress.done();
+                        this.movieDialog = false;
                     });
             } else {
                 // Update movie
@@ -146,6 +240,7 @@ export default {
                     .then((response) => {
                         const movie = (response.data).data
                         Nprogress.done();
+                        this.movieDialog = false;
                     });
             }
         },
@@ -167,7 +262,7 @@ export default {
             item.image = false;
         },
         editMovie(movie) {
-            $('html, body').animate({scrollTop : 0},500);
+            this.movieDialog = true;
 
             this.movie.id = movie.id;
             this.movie.category_id = movie.category_id;
@@ -177,15 +272,23 @@ export default {
             this.preview_image = this.image_path + movie.image;
             this.edit = true;
         },
-        deleteMovie(id) {
+        confirmDelete(id) {
+            this.confirmDialog = true;
+            this.movie.id = id;
+        },
+        viewMovie(youtubeId) {
+            this.viewDialog = true;
+            this.movie.youtubeId = youtubeId;
+        },
+        deleteMovie() {
             Nprogress.start();
-            if(confirm('Are you sure you want to delete this?')) {
-                MovieService.delete(id)
-                    .then((response) => {
-                        const movie = (response.data).data
-                        Nprogress.done();
-                    });
-            }
+            MovieService.delete(this.movie.id)
+                .then((response) => {
+                    const movie = (response.data).data
+                    this.movie.id = '';
+                    Nprogress.done();
+                    this.confirmDialog = false;
+                });
         },
         resetForm() {
             this.movie.id = '';
@@ -231,13 +334,15 @@ export default {
                 default:
                     break;
             }
+        },
+        ready(youtubePlayer) {
+            this.youtubePlayer = youtubePlayer;
         }
     },
 
     async mounted () {
         Echo.channel('movie-channel')
             .listen('MovieEvent', (movie) => {
-                console.log(movie);
                 this.updateList(movie);
                 if (this.user) {
                     this.resetForm();
@@ -249,40 +354,27 @@ export default {
             this.resetInfiniteLoading();
         });
 
+        EventBus.$on('add-movie', () => {
+            this.movieDialog = true;
+        });
+
         this.categories = ((await CategoryService.get()).data).data
+    },
+
+    watch: {
+        movieDialog: function(val) {
+            if(!val) {
+                this.$refs.form.reset()
+            }
+        },
+        viewDialog: function(val) {
+            if(!val) {
+                this.youtubePlayer.pauseVideo()
+            }
+        }
     }
 }
 </script>
 
-<style>
-
-.vue-notification {
-  padding: 15px;
-  margin: 0 5px 5px;
-
-  font-size: 16px;
-
-  color: #ffffff;
-  background: #44A4FC;
-  border-left: 5px solid #187FE7;
-
-  &.warn {
-    background: #ffb648;
-    border-left-color: #f48a06;
-  }
-
-  &.error {
-    background: #E54D42;
-    border-left-color: #B82E24;
-  }
-
-  &.success {
-    background: #68CD86;
-    border-left-color: #42A85F;
-  }
-}
-
-.content {
-    padding-top: 90px;
-}
+<style lang="css">
 </style>

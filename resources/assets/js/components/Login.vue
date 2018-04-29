@@ -50,10 +50,6 @@ export default {
             this.login(this.form).then(() => {
                 this.$router.push('/')
             })
-            // AuthService.login(credentials).then((response) => {
-            //     let token = response.data.access_token
-            //     localStorage.setItem('access_token', token)
-            // })
         }
     }
 }
