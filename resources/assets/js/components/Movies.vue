@@ -33,6 +33,14 @@
 
                             <v-text-field
                             type="text"
+                            label="Url"
+                            v-model="movie.url"
+                            required
+                            :rules="[required]"
+                            ></v-text-field>
+
+                            <v-text-field
+                            type="text"
                             label="Youtube Id"
                             v-model="movie.youtubeId"
                             ></v-text-field>
@@ -105,21 +113,22 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn icon>
+                            <v-btn icon @click="downloadMovie(movie.url)">
                                 <v-icon>file_download</v-icon>
                             </v-btn>
                             <v-btn icon @click="viewMovie(movie.youtubeId)" v-if="movie.youtubeId">
                                 <v-icon>theaters</v-icon>
                             </v-btn>
                             <v-btn icon @click="editMovie(movie)" v-if="user">
-                                <v-icon >mode_edit</v-icon>
+                                <v-icon color="teal">mode_edit</v-icon>
                             </v-btn>
                             <v-btn icon @click="confirmDelete(movie.id)" v-if="user">
-                                <v-icon>delete</v-icon>
+                                <v-icon color="pink">delete</v-icon>
                             </v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-flex>
+
             </v-layout>
         </v-container>
         <infinite-loading @infinite="infiniteHandler" ref="infiniteLoading">
@@ -153,6 +162,7 @@ export default {
                 category_id: '',
                 title: '',
                 year: '',
+                url: '',
                 youtubeId: ''
             },
             categories: [],
@@ -215,6 +225,7 @@ export default {
             formData.append('title', this.movie.title);
             formData.append('category_id', this.movie.category_id);
             formData.append('year', this.movie.year);
+            formData.append('url', this.movie.url);
             formData.append('youtubeId', this.movie.youtubeId);
             formData.append('file', this.file);
 
@@ -268,6 +279,7 @@ export default {
             this.movie.category_id = movie.category_id;
             this.movie.title = movie.title;
             this.movie.year = movie.year;
+            this.movie.url = movie.url;
             this.movie.youtubeId = movie.youtubeId;
             this.preview_image = this.image_path + movie.image;
             this.edit = true;
@@ -279,6 +291,22 @@ export default {
         viewMovie(youtubeId) {
             this.viewDialog = true;
             this.movie.youtubeId = youtubeId;
+        },
+        downloadMovie(url) {
+            window.location.href = APP_FILE + url
+            // window.open(APP_FILE + url, '_blank')
+            // axios({
+            //     url: APP_FILE + url,
+            //     method: 'GET',
+            //     responseType: 'blob', // important
+            // }).then((response) => {
+            //     const url = window.URL.createObjectURL(new Blob([response.data]));
+            //     const link = document.createElement('a');
+            //     link.href = url;
+            //     link.setAttribute('download');
+            //     document.body.appendChild(link);
+            //     link.click();
+            // });
         },
         deleteMovie() {
             Nprogress.start();
@@ -294,6 +322,7 @@ export default {
             this.movie.id = '';
             this.movie.title = '';
             this.movie.year = '';
+            this.movie.url = '';
             this.movie.youtubeId = '';
             this.file = '';
             this.preview_image = '';
@@ -314,6 +343,7 @@ export default {
                 category_name: movie.category_name,
                 title: movie.title,
                 year: movie.year,
+                url: movie.url,
                 youtubeId: movie.youtubeId,
                 image: movie.image
             };

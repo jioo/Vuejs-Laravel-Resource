@@ -30,7 +30,7 @@
                     </v-list-tile-content>
                 </v-list-tile>
 
-                <v-list-tile dark v-if="user">
+                <v-list-tile dark @click="moveTo('/genre')" v-if="user">
                     <v-list-tile-action>
                         <v-icon>list</v-icon>
                     </v-list-tile-action>
@@ -173,6 +173,16 @@ export default {
             'addFilter',
             'resetFilter'
         ]),
+        async getCategories () {
+            let categories = ((await CategoryService.get()).data).data
+
+            // Clone array & Create new key/value pair
+            this.categories = categories.map((element) => {
+                const obj = Object.assign({}, element);
+                obj.active = false;
+                return obj;
+            });
+        },
         loginUser () {
             if (this.$refs.form.validate()) {
                 this.login(this.form).then((res) => {
@@ -181,6 +191,7 @@ export default {
             }
         },
         addMovie() {
+            this.$router.push('/');
             EventBus.$emit('add-movie');
         },
         search () {
@@ -212,19 +223,20 @@ export default {
             this.newFilter.category = (category.active) ? category.value: '0';
             this.addFilter(this.newFilter);
             EventBus.$emit('filter-changed');
+            this.$router.push('/')
+        },
+        moveTo(url) {
+            this.$router.push(url);
         }
     },
 
     async mounted () {
-        let categories = ((await CategoryService.get()).data).data
-        
-        // Clone array & Create new key/value pair
-        this.categories = categories.map((element) => {
-            const obj = Object.assign({}, element);
-            obj.active = false;
-            return obj;
-        });
+        this.getCategories();
         this.newFilter = this.filter;
+
+        EventBus.$on('category-updated', () => {
+            this.getCategories();
+        });
     },
 
     watch: {

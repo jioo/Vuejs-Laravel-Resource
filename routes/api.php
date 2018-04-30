@@ -17,12 +17,15 @@ Route::post('register', 'UserController@register');
 
 Route::get('movies', 'MovieController@index');
 Route::get('movie/{id}', 'MovieController@show');
+Route::get('category', 'CategoryController@index');
 
 // Athenticated api
 //Route::group(['middleware' => 'auth:api'], function () {
     Route::post('movie', 'MovieController@store');
     Route::put('movie', 'MovieController@store');
     Route::delete('movie/{id}', 'MovieController@destroy');
-//});
 
-Route::resource('category', 'CategoryController', ['except' => ['store', 'destroy']]);
+    Route::post('category', 'CategoryController@store');
+    Route::put('category', 'CategoryController@store');
+    Route::delete('category/{id}', 'CategoryController@destroy');
+//});

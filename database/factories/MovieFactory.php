@@ -7,6 +7,7 @@ $factory->define(App\Movie::class, function (Faker $faker) {
         'category_id' => 0,
         'title' => $faker->text(20),
         'year' => '2018',
+        'url' => 'movie.mkv',
         'youtubeId' => '',
         'image' => 'default.jpg'
     ];

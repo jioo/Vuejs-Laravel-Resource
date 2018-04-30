@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import AuthService from './services/AuthService'
+import router from './router'
 
 Vue.use(Vuex)
 
@@ -47,6 +48,8 @@ export default new Vuex.Store({
         logout ({commit}) {
             localStorage.removeItem('access_token')
             commit('logout')
+
+            router.push('/')
         },
         addFilter ({commit}, filter) {
             commit('addFilter', filter)

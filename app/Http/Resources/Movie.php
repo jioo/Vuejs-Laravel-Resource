@@ -23,6 +23,7 @@ class Movie extends Resource
             'category_name' => $category_name,
             'title' => $this->title,
             'year' => $this->year,
+            'url' => $this->url,
             'youtubeId' => $this->youtubeId,
             'image' => $this->image
         ];

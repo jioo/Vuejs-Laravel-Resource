@@ -52,6 +52,7 @@ class MovieController extends Controller
         $movie->title = $request->input('title');
         $movie->category_id = $request->input('category_id');
         $movie->year = $request->input('year');
+        $movie->url = $request->input('url');
         $movie->youtubeId = (!empty($request->input('youtubeId')))
             ? $request->input('youtubeId')
             : '';

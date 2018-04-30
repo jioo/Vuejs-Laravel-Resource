@@ -12,7 +12,7 @@ class Movie extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'year', 'youtubeId'
+        'title', 'year', 'url', 'youtubeId'
     ];
 
     /**
