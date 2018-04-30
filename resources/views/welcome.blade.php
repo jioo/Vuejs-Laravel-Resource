@@ -29,6 +29,24 @@
             <v-app dark id="inspire">
                 <navbar></navbar>
                 <router-view></router-view>
+                <v-footer app fixed dark class="pt-4 pb-4 text-md-center">
+                    <v-layout>
+                        <v-flex xs12>
+                            <div>
+                                <v-icon>code</v-icon>
+                                with
+                                <v-icon>favorite</v-icon>
+                                by
+                                <b>STII - ITU</b>
+                                &nbsp;
+                                - &nbsp;&nbsp;Powered By:
+                                <a href="https://laravel.com/" target="_blank"><img src="https://cdn.worldvectorlogo.com/logos/laravel.svg" alt="" width="25" height="25" class="mt-2"></a>
+                                <a href="https://vuejs.org/" target="_blank"><img src="https://avatars1.githubusercontent.com/u/6128107?s=400&v=4" alt="" width="25" height="25" class="mt-2"></a>
+                                <a href="https://vuetifyjs.com/en/" target="_blank"><img src="https://avatars0.githubusercontent.com/u/22138497?s=400&v=4" alt="" width="25" height="25"></a>
+                            </div>
+                        </v-flex>
+                    </v-layout>
+                </v-footer>
                 <notifications position="bottom right" classes="vue-notification"/>
             </v-app>
             <!-- <div class="container-fluid">
