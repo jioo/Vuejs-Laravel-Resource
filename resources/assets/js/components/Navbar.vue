@@ -137,6 +137,7 @@ import { mapState, mapActions } from 'vuex'
 import { EventBus } from '../event-bus/event-bus';
 import CategoryService from '../services/CategoryService'
 import AuthService from '../services/AuthService'
+import _ from 'lodash'
 
 export default {
     data () {
@@ -155,6 +156,7 @@ export default {
                 search: '',
                 category: 0
             },
+            timer: 0,
             required: (value) => !!value || 'This field is required.'
         }
     },
@@ -195,8 +197,14 @@ export default {
             EventBus.$emit('add-movie');
         },
         search () {
-            this.addFilter(this.newFilter);
-            EventBus.$emit('filter-changed');
+            // Clears the timer on a call so there is always x seconds in between calls
+            clearTimeout(this.timer);
+
+            // If the timer resets before it hits 150ms it will not run
+            this.timer = setTimeout(function(){
+                this.addFilter(this.newFilter);
+                EventBus.$emit('filter-changed');
+            }.bind(this), 150);
         },
         reset () {
             this.resetFilter();

@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::post('register', 'UserController@register');
+Route::post('login', 'UserController@login');
 
 Route::get('movies', 'MovieController@index');
 Route::get('movie/{id}', 'MovieController@show');

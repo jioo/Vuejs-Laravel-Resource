@@ -3,20 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\User;
-use App\Http\Resources\User as UserResource;
+use \Laravel\Passport\Client;
 
 class UserController extends Controller
 {
+    private $client;
+
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * DefaultController constructor.
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->client = Client::where('password_client', 1)->first();
     }
 
     /**
@@ -26,65 +25,51 @@ class UserController extends Controller
      */
     public function register(Request $request)
     {
-        // $this->validate($request, [
-        //     'name' => 'required|max:255',
-        //     'email' => 'required|email|max:255|unique:users',
-        //     'password' => 'required|min:6',
-        // ]);
-
         $user = new User();
         $user->name = $request->input('name');
-        $user->email = $request->input('email');
+        $user->email = $request->input('username');
         $user->password = bcrypt($request->input('password'));
 
         // Return the article reource if query has been successful
         if($user->save()) {
-            return new UserResource($user);
+            return $this->authenticate($request);
         }
     }
 
     /**
-     * Display the specified resource.
+     * Login user
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function login(Request $request) {
+        return $this->authenticate($request);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+    /* ========================================================================= *\
+     * Helpers
+    \* ========================================================================= */
 
     /**
-     * Update the specified resource in storage.
+     * Authenticate user
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Route
      */
-    public function update(Request $request, $id)
-    {
-        //
+    private function authenticate($request) {
+        $request->request->add([
+            'grant_type'    => 'password',
+            'client_id'     => $this->client->id,
+            'client_secret' => $this->client->secret,
+            'username'      => $request->input('username'),
+            'password'      => $request->input('password'),
+            'scope'         => '',
+        ]);
+
+        $proxy = Request::create(
+            'oauth/token',
+            'POST'
+        );
+
+        return \Route::dispatch($proxy);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

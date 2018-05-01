@@ -3,7 +3,7 @@ import Nprogress from 'nprogress'
 
 export default () => {
     const instance = axios.create({
-        baseURL: APP_URL + '/vue-laravel/public/'
+        baseURL: APP_URL + '/vue-laravel/public/api/'
     })
 
     // Authorization header

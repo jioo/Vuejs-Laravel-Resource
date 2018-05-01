@@ -2,7 +2,7 @@ import Api from './Api'
 
 export default {
     get (filter) {
-        return Api().get('api/movies', {
+        return Api().get('movies', {
             params: {
                 page: filter.page,
                 search: filter.search,
@@ -11,15 +11,15 @@ export default {
         })
     },
     show (id) {
-        return Api().get(`api/movie/${id}`)
+        return Api().get(`movie/${id}`)
     },
     post (movie) {
-        return Api().post('api/movie', movie, { headers: {'Content-Type': 'multipart/form-data'} })
+        return Api().post('movie', movie, { headers: {'Content-Type': 'multipart/form-data'} })
     },
     put (movie) {
-        return Api().put('api/movie', movie, { headers: {'Content-Type': 'multipart/form-data'} })
+        return Api().put('movie', movie, { headers: {'Content-Type': 'multipart/form-data'} })
     },
     delete (id) {
-        return Api().delete(`api/movie/${id}`)
+        return Api().delete(`movie/${id}`)
     }
 }
