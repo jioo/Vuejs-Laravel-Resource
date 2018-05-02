@@ -54,7 +54,7 @@
                 <notifications position="bottom right" classes="vue-notification"/>
             </div> -->
         </div>
-        <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('js/app.js', Request::secure()) }}" type="text/javascript"></script>
         <style media="screen">
         .vue-notification {
             padding: 15px;
