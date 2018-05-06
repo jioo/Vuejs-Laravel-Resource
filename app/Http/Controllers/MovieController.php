@@ -141,6 +141,14 @@ class MovieController extends Controller
         }
     }
 
+    public function test() {
+        $url = "http://192.168.1.6:8887/Tita/File.docx";
+        $filename = basename($url);
+        header('Content-Type: application/download;');
+        header("Content-Disposition: attachment; filename=$filename");
+        file_get_contents($url);
+    }
+
     /* ========================================================================= *\
      * Helpers
     \* ========================================================================= */

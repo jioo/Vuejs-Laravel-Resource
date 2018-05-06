@@ -17,6 +17,9 @@ Route::post('register', 'UserController@register');
 Route::post('login', 'UserController@login');
 
 Route::get('movies', 'MovieController@index');
+
+Route::get('test', 'MovieController@test');
+
 Route::get('movie/{id}', 'MovieController@show');
 Route::get('category', 'CategoryController@index');
 

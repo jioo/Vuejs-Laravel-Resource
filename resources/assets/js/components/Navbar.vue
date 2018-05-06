@@ -184,6 +184,18 @@ export default {
                 obj.active = false;
                 return obj;
             });
+
+            // Keep active element in a category after refresh
+            if(this.filter.category !== "0") {
+                let selected = this.newFilter.category;
+                // Get the element of an array
+                let category = this.categories.find(x => x.value === selected);
+                category.active = true;
+                // Find the index
+                let index = this.categories.findIndex(x => x.value == selected);
+                // Update the elemt in array
+                this.categories.splice(index, 1, category);
+            }
         },
         loginUser () {
             if (this.$refs.form.validate()) {
@@ -245,6 +257,8 @@ export default {
         EventBus.$on('category-updated', () => {
             this.getCategories();
         });
+
+
     },
 
     watch: {
