@@ -15,7 +15,7 @@ cp .env.example .env # Copy configuration file
 php artisan key:generate # Generate unique key
 
 # Update .env file with Pusher key
-Create/Login account in <a href="https://pusher.com/">Pusher</a> to get a key
+Create/Login account in https://pusher.com/ to get a key
 
 # Migrate database
 php artisan migrate --seed # Create Table Schema and seed sample data
