@@ -37,7 +37,7 @@
                                 with
                                 <v-icon>favorite</v-icon>
                                 by
-                                <b>STII - ITU</b>
+                                <b>Justine Joshua Quiazon</b>
                                 &nbsp;
                                 - &nbsp;&nbsp;Powered By:
                                 <a href="https://laravel.com/" target="_blank"><img src="https://cdn.worldvectorlogo.com/logos/laravel.svg" alt="" width="25" height="25" class="mt-2"></a>
